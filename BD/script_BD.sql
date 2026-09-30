@@ -195,3 +195,29 @@ INSERT INTO ESTADO_CITA (nombre) VALUES
 ('Atendida'),
 ('No Asistió'),
 ('Cancelada');
+
+
+--nota del Rukasu: aqui se hace el Trigger
+DELIMITER //
+
+CREATE TRIGGER trg_evitar_choque_citas_paciente
+BEFORE INSERT ON CITA
+FOR EACH ROW
+BEGIN
+    DECLARE citas_existentes INT;
+    SELECT COUNT(*) INTO citas_existentes
+    FROM CITA
+    WHERE Rut_Paciente = NEW.Rut_Paciente
+        AND Fecha = NEW.Fecha
+        AND Hora = NEW.Hora
+        AND Id_Estado IN (1, 2);
+    IF citas_existentes > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El paciente ya tiene una cita en la misma fecha y hora.';
+    END IF;
+END //
+
+DELIMETER;
+
+
+
