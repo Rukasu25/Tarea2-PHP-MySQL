@@ -1,0 +1,6 @@
+
+body{background:#f4f6f8}
+.navbar-brand{font-weight:700}
+.card{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.table td,.table th{vertical-align:middle}
+.container-main{max-width:1200px}
