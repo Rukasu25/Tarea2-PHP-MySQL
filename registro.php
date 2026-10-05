@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'conexion.php';
+require_once __DIR__ . '/../includes/common.php';
 //NOTA IMPORTANTE!!: se debe cambiar la ruta una vez se cambien los archivos de lugar
 $error = '';
 $exito = '';
@@ -12,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $telefono = trim($_POST['telefono']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
+    $id_prevision = (int)($_POST['id_prevision'] ?? 0);
 
     //--aqui se valida el formato del RUT
 
