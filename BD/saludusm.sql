@@ -33,32 +33,36 @@ CREATE TABLE centro_medico (
 );
 
 CREATE TABLE usuario (
-    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(150) PRIMARY KEY,
     rut VARCHAR(12) NOT NULL UNIQUE,
     nombre VARCHAR(80) NOT NULL,
     apellido VARCHAR(80) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
     telefono VARCHAR(30),
     fecha_nacimiento DATE,
     sexo ENUM('F','M','X') NULL,
     password_hash VARCHAR(255) NOT NULL,
-    rol ENUM('PACIENTE','MEDICO','ADMIN') NOT NULL
+    rol ENUM('PACIENTE','MEDICO','ADMIN') NOT NULL,
+    activo TINYINT(1) NOT NULL DEFAULT 1,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE paciente (
-    id_paciente INT PRIMARY KEY,
+    id_paciente INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(150) NOT NULL UNIQUE,
     id_prevision INT NOT NULL,
-    CONSTRAINT fk_paciente_usuario FOREIGN KEY (id_paciente)
-        REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+    CONSTRAINT fk_paciente_usuario FOREIGN KEY (email)
+        REFERENCES usuario(email) ON DELETE CASCADE,
     CONSTRAINT fk_paciente_prevision FOREIGN KEY (id_prevision)
         REFERENCES prevision(id_prevision)
 );
 
 CREATE TABLE medico (
-    id_medico INT PRIMARY KEY,
-    CONSTRAINT fk_medico_usuario FOREIGN KEY (id_medico)
-        REFERENCES usuario(id_usuario) ON DELETE CASCADE
+    id_medico INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    CONSTRAINT fk_medico_usuario FOREIGN KEY (email)
+        REFERENCES usuario(email) ON DELETE CASCADE
 );
+
 
 CREATE TABLE medico_especialidad (
     id_medico INT NOT NULL,
