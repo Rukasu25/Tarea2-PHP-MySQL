@@ -1,12 +1,12 @@
 <?php
 session_start();
-require_once __DIR__ . '/../includes/common.php';
-//NOTA IMPORTANTE!!: se debe cambiar la ruta una vez se cambien los archivos de lugar
+require_once __DIR__ . '/includes/common.php';
+require_once __DIR__ . '/config/db.php';
 $error = '';
 $exito = '';
 
 
-$previsiones = db()->query("SELECT * FROM prevision ORDER BY nombre")->fetchAll();
+$previsiones = $pdo->query("SELECT * FROM prevision ORDER BY nombre")->fetchAll();
 
 
 
@@ -31,45 +31,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     elseif (strlen($password) < 6) {
         $error = "La contraseña debe tener al menos 6 caracteres.";
     }
-    else{
-        //--verificar que RUT e EMAIL sean unicos
-        $stmt_check = db()->prepare("SELECT COUNT(*) FROM usuario WHERE rut = ? OR email = ?");
+    else {
+        // Verificar que RUT e Email sean únicos directamente en la tabla Paciente
+        $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM Paciente WHERE Rut_Paciente = ? OR Email = ?");
         $stmt_check->execute([$rut, $email]);
-        if ($stmt->fetchColumn() > 0) {
+        
+        if ($stmt_check->fetchColumn() > 0) {
             $error = 'El RUT o el email ya están registrados.';
         } else {
             try {
-                db()->beginTransaction();
 
-                // 1. Insertar USUARIO
                 $hash = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = db()->prepare("
-                    INSERT INTO usuario (email, rut, nombre, apellido, telefono, 
-                                         fecha_nacimiento, sexo, password_hash, rol)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PACIENTE')
+                $stmt_insert = $pdo->prepare("
+                    INSERT INTO Paciente (Rut_Paciente, Nombre, Sexo, Fecha_Nacimiento, Telefono_contacto, Email, Contrasena) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                 ");
-                $stmt->execute([
-                    $email, $rut, $nombre, $apellido, $telefono,
-                    $fecha_nac, $sexo, $hash
-                ]);
-
-                // 2. Insertar PACIENTE
-                $stmt = db()->prepare("
-                    INSERT INTO paciente (email, id_prevision) VALUES (?, ?)
-                ");
-                $stmt->execute([$email, $id_prevision]);
-
-                db()->commit();
-
+                
+                $stmt_insert->execute([$rut, $nombre, $sexo, $fecha_nacido, $telefono, $email, $hash]);
                 $exito = '¡Registro exitoso! Ahora puede iniciar sesión.';
-
+                
             } catch (Throwable $e) {
-                db()->rollBack();
-                if ($e->getCode() == 23000) {
-                    $error = 'El RUT o el email ya están registrados.';
-                } else {
-                    $error = 'Error al registrar: ' . $e->getMessage();
-                }
+                $error = 'Error de base de datos: ' . $e->getMessage();
             }
         }
     }
