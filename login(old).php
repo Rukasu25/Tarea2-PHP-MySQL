@@ -1,48 +1,50 @@
 <?php
 require_once __DIR__ . '/config/db.php';
-require_once __DIR__ . '/includes/common.php';
 
-$error = "";
+if (estaLogueado()) {
+    redirigirSegunRol();
+}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $rut = trim($_POST['rut'] ?? '');
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if (empty($rut) || empty($password)) {
-        $error = "Debe completar todos los campos.";
+    if (empty($email) || empty($password)) {
+        $error = 'Debe completar todos los campos.';
     } else {
-        try {
-            // -- busca directamente en la tabla Paciente
-            $stmt = $pdo->prepare("SELECT * FROM Paciente WHERE Rut_Paciente = ?");
-            $stmt->execute([$rut]);
-            $paciente = $stmt->fetch();
+        $stmt = $pdo->prepare("SELECT * FROM usuario WHERE email = ? AND activo = 1");
+        $stmt->execute([$email]);
+        $usuario = $stmt->fetch();
 
-            // -- verifica si existe y si la contraseña coincide
-            if ($paciente && password_verify($password, $paciente['Contrasena'])) {
-                
-                // --se crean variables de inicio de sesion
-                $_SESSION['email'] = $paciente['Email'];
-                $_SESSION['rut'] = $paciente['Rut_Paciente'];
-                $_SESSION['rol'] = 'paciente';
-                
-                // --redireccion de db.php
-                redirigirSegunRol(); 
-                
-            } else {
-                $error = "RUT o contraseña incorrectos.";
+        if ($usuario && password_verify($password, $usuario['password_hash'])) {
+            $_SESSION['user'] = [
+                'email' => $usuario['email'],
+                'rut' => $usuario['rut'],
+                'nombre' => $usuario['nombre'],
+                'apellido' => $usuario['apellido'],
+                'rol' => $usuario['rol'],
+            ];
+
+            // Redirigir según rol
+            switch ($usuario['rol']) {
+                case 'PACIENTE': header('Location: /Saludusm/paciente/dashboard.php'); exit;
+                case 'MEDICO':   header('Location: /Saludusm/medico/dashboard.php');   exit;
+                case 'ADMIN':    header('Location: /Saludusm/admin/dashboard.php');    exit;
             }
-        } catch (Throwable $e) {
-            $error = "Error de base de datos: " . $e->getMessage();
+        } else {
+            $error = 'Email o contraseña incorrectos.';
         }
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Acceso - SaludUSM</title>
+    <!-- Frontend Bonus: Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light d-flex align-items-center vh-100">

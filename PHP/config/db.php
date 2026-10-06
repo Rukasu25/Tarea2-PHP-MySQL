@@ -35,7 +35,7 @@ function tieneRol($rol) {
 
 function requiereLogin() {
     if (!estaLogueado()) {
-        header('Location: /Saludusm/login.php');
+        header('Location: /Tarea2-PHP-MySQL/PHP/login.php');
         exit;
     }
 }
@@ -43,7 +43,7 @@ function requiereLogin() {
 function requiereRol($rol) {
     requiereLogin();
     if (!tieneRol($rol)) {
-        header('Location: /Saludusm/index.php');
+        header('Location: /Tarea2-PHP-MySQL/PHP/index.php');
         exit;
     }
 }
@@ -60,16 +60,21 @@ function mostrarMensaje() {
 }
 
 function redirigirSegunRol() {
+    /*
     if (!estaLogueado()) {
-        header('Location: /Saludusm/login.php');
+        header('Location: /Tarea2-PHP-MySQL/PHP/login.php');
         exit;
     }
     switch ($_SESSION['rol']) {
-        case 'paciente': header('Location: /Saludusm/paciente/dashboard.php'); break;
-        case 'medico':   header('Location: /Saludusm/medico/dashboard.php');   break;
-        case 'admin':    header('Location: /Saludusm/admin/dashboard.php');    break;
-        default:         header('Location: /Saludusm/login.php');
+        case 'paciente': header('Location: /Tarea2-PHP-MySQL/PHP/paciente/dashboard.php'); break;
+        case 'medico':   header('Location: /Tarea2-PHP-MySQL/PHP/medico/dashboard.php');   break;
+        case 'admin':    header('Location: /Tarea2-PHP-MySQL/PHP/admin/dashboard.php');    break;
+        default:         header('Location: /Tarea2-PHP-MySQL/PHP/login.php');
     }
     exit;
+    */
+    echo "<h1>¡Contraseña correcta y validada!</h1>";
+    echo "<p><a href='paciente/dashboard.php'>Haz clic aquí para ir al dashboard manualmente</a></p>";
+    exit();
 }
 ?>
