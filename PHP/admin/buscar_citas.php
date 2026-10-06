@@ -7,9 +7,9 @@ foreach(['desde'=>'DATE(v.fecha_hora)>=?','hasta'=>'DATE(v.fecha_hora)<=?','id_c
     if(($_GET[$k]??'')!==''){ $where[]=$cond;$params[]=$_GET[$k];}
 }
 $sql="SELECT v.* FROM vw_citas_detalle v".($where?' WHERE '.implode(' AND ',$where):'')." ORDER BY v.fecha_hora DESC";
-$s=db()->prepare($sql);$s->execute($params);$rows=$s->fetchAll();
-$cent=db()->query("SELECT * FROM centro_medico ORDER BY nombre")->fetchAll();$esp=db()->query("SELECT * FROM especialidad ORDER BY nombre")->fetchAll();$med=db()->query("SELECT id_usuario,CONCAT(nombre,' ',apellido) n FROM usuario WHERE rol='MEDICO' ORDER BY n")->fetchAll();
-$est=db()->query("SELECT nombre FROM estado_cita ORDER BY nombre")->fetchAll();$reg=db()->query("SELECT DISTINCT region FROM centro_medico ORDER BY region")->fetchAll();$pre=db()->query("SELECT nombre FROM prevision ORDER BY nombre")->fetchAll();
+$s=$pdo->prepare($sql);$s->execute($params);$rows=$s->fetchAll();
+$cent=$pdo->query("SELECT * FROM centro_medico ORDER BY nombre")->fetchAll();$esp=$pdo->query("SELECT * FROM especialidad ORDER BY nombre")->fetchAll();$med=$pdo->query("SELECT id_usuario,CONCAT(nombre,' ',apellido) n FROM usuario WHERE rol='MEDICO' ORDER BY n")->fetchAll();
+$est=$pdo->query("SELECT nombre FROM estado_cita ORDER BY nombre")->fetchAll();$reg=$pdo->query("SELECT DISTINCT region FROM centro_medico ORDER BY region")->fetchAll();$pre=$pdo->query("SELECT nombre FROM prevision ORDER BY nombre")->fetchAll();
 header_html('Busqueda avanzada');
 ?>
 <div class="card p-3"><h2>Busqueda avanzada de citas</h2><form class="row g-2">

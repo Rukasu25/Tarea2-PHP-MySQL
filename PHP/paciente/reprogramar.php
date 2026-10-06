@@ -1,11 +1,11 @@
 <?php
 require_once __DIR__ . '/../includes/common.php'; require_role('PACIENTE'); $u=user(); $id=(int)($_GET['id']??0); $error='';
-$s=db()->prepare("SELECT * FROM vw_citas_detalle WHERE id_cita=? AND id_paciente=?");$s->execute([$id,$u['id_usuario']]);$c=$s->fetch();
+$s=$pdo->prepare("SELECT * FROM vw_citas_detalle WHERE id_cita=? AND id_paciente=?");$s->execute([$id,$u['id_usuario']]);$c=$s->fetch();
 if(!$c || strtotime($c['fecha_hora'])<=time() || !in_array($c['estado'],['Reservada','Confirmada'],true)) exit('Esta cita no puede reprogramarse.');
 if($_SERVER['REQUEST_METHOD']==='POST'){
     try{
         $dt=$_POST['fecha'].' '.$_POST['hora'].':00';
-        $q=db()->prepare("UPDATE cita SET fecha_hora=? WHERE id_cita=? AND id_paciente=? AND fecha_hora>NOW()
+        $q=$pdo->prepare("UPDATE cita SET fecha_hora=? WHERE id_cita=? AND id_paciente=? AND fecha_hora>NOW()
         AND id_estado IN (SELECT id_estado FROM estado_cita WHERE nombre IN ('Reservada','Confirmada'))");
         $q->execute([$dt,$id,$u['id_usuario']]);
         if($q->rowCount()===0) throw new Exception('La cita ya no puede modificarse.');

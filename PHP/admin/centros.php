@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($accion, ['crear', 'actual
     } else {
         try {
             if ($accion === 'crear') {
-                $stmt = db()->prepare("
+                $stmt = $pdo->prepare("
                     INSERT INTO centro_medico (codigo, nombre, comuna, region)
                     VALUES (?, ?, ?, ?)
                 ");
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($accion, ['crear', 'actual
                 flash('Centro creado correctamente.');
             } else {
                 $id = (int)$_POST['id_centro'];
-                $stmt = db()->prepare("
+                $stmt = $pdo->prepare("
                     UPDATE centro_medico SET codigo = ?, nombre = ?, comuna = ?, region = ?
                     WHERE id_centro = ?
                 ");
@@ -54,18 +54,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'eliminar') {
     $id = (int)$_POST['id_centro'];
     try {
         // Verificar si tiene médicos o citas asociadas
-        $stmt = db()->prepare("SELECT COUNT(*) FROM medico_centro WHERE id_centro = ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM medico_centro WHERE id_centro = ?");
         $stmt->execute([$id]);
         $tiene_medicos = (int)$stmt->fetchColumn();
 
-        $stmt = db()->prepare("SELECT COUNT(*) FROM cita WHERE id_centro = ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM cita WHERE id_centro = ?");
         $stmt->execute([$id]);
         $tiene_citas = (int)$stmt->fetchColumn();
 
         if ($tiene_medicos > 0 || $tiene_citas > 0) {
             flash('No se puede eliminar: el centro tiene médicos o citas asociadas.', 'danger');
         } else {
-            $stmt = db()->prepare("DELETE FROM centro_medico WHERE id_centro = ?");
+            $stmt = $pdo->prepare("DELETE FROM centro_medico WHERE id_centro = ?");
             $stmt->execute([$id]);
             flash('Centro eliminado.');
         }
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'eliminar') {
 // ============================================================
 $centro_editar = null;
 if ($id_editar > 0) {
-    $stmt = db()->prepare("SELECT * FROM centro_medico WHERE id_centro = ?");
+    $stmt = $pdo->prepare("SELECT * FROM centro_medico WHERE id_centro = ?");
     $stmt->execute([$id_editar]);
     $centro_editar = $stmt->fetch();
 }
@@ -88,7 +88,7 @@ if ($id_editar > 0) {
 // ============================================================
 // LISTADO DE CENTROS
 // ============================================================
-$centros = db()->query("
+$centros = $pdo->query("
     SELECT 
         cm.id_centro, cm.codigo, cm.nombre, cm.comuna, cm.region,
         (SELECT COUNT(*) FROM medico_centro WHERE id_centro = cm.id_centro) AS medicos,

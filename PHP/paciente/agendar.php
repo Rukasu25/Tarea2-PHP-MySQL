@@ -6,14 +6,14 @@ $u = user();
 $error = '';
 
 // Obtener id_paciente
-$stmt = db()->prepare("SELECT id_paciente FROM paciente WHERE email = ?");
+$stmt = $pdo->prepare("SELECT id_paciente FROM paciente WHERE email = ?");
 $stmt->execute([$u['email']]);
 $paciente = $stmt->fetch();
 $id_paciente = (int)$paciente['id_paciente'];
 
 // Datos para los selects
-$especialidades = db()->query("SELECT * FROM especialidad ORDER BY nombre")->fetchAll();
-$centros = db()->query("SELECT * FROM centro_medico ORDER BY nombre")->fetchAll();
+$especialidades = $pdo->query("SELECT * FROM especialidad ORDER BY nombre")->fetchAll();
+$centros = $pdo->query("SELECT * FROM centro_medico ORDER BY nombre")->fetchAll();
 
 // Filtros seleccionados (vienen por GET)
 $sel_esp = (int)($_GET['id_especialidad'] ?? 0);
@@ -22,7 +22,7 @@ $sel_centro = (int)($_GET['id_centro'] ?? 0);
 // Cargar médicos según filtros
 $medicos = [];
 if ($sel_esp > 0 && $sel_centro > 0) {
-    $stmt = db()->prepare("
+    $stmt = $pdo->prepare("
         SELECT m.id_medico, CONCAT(u.nombre, ' ', u.apellido) AS nombre
         FROM medico m
         JOIN usuario u ON u.email = m.email
@@ -60,19 +60,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         else {
             // Validar especialidad del médico
-            $stmt = db()->prepare("SELECT COUNT(*) FROM medico_especialidad WHERE id_medico = ? AND id_especialidad = ?");
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM medico_especialidad WHERE id_medico = ? AND id_especialidad = ?");
             $stmt->execute([$id_medico, $id_especialidad]);
             if ($stmt->fetchColumn() == 0) {
                 $error = 'El médico no posee esa especialidad.';
             } else {
                 // Validar centro del médico
-                $stmt = db()->prepare("SELECT COUNT(*) FROM medico_centro WHERE id_medico = ? AND id_centro = ?");
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM medico_centro WHERE id_medico = ? AND id_centro = ?");
                 $stmt->execute([$id_medico, $id_centro]);
                 if ($stmt->fetchColumn() == 0) {
                     $error = 'El médico no atiende en ese centro.';
                 } else {
                     try {
-                        $stmt = db()->prepare("
+                        $stmt = $pdo->prepare("
                             INSERT INTO cita (id_paciente, id_medico, id_especialidad, id_centro, fecha_hora, id_estado)
                             VALUES (?, ?, ?, ?, ?, (SELECT id_estado FROM estado_cita WHERE nombre='Reservada'))
                         ");

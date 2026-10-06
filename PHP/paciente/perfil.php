@@ -5,10 +5,10 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     try{
         if($pass!==''){
             if(strlen($pass)<10 || !preg_match('/[A-Z]/',$pass)||!preg_match('/[a-z]/',$pass)||!preg_match('/\d/',$pass)) throw new Exception('Nueva contraseña no cumple requisitos.');
-            db()->prepare("UPDATE usuario SET nombre=?,apellido=?,telefono=?,password_hash=? WHERE id_usuario=?")
+            $pdo->prepare("UPDATE usuario SET nombre=?,apellido=?,telefono=?,password_hash=? WHERE id_usuario=?")
             ->execute([$nombre,$apellido,$telefono,password_hash($pass,PASSWORD_DEFAULT),$u['id_usuario']]);
-        }else db()->prepare("UPDATE usuario SET nombre=?,apellido=?,telefono=? WHERE id_usuario=?")->execute([$nombre,$apellido,$telefono,$u['id_usuario']]);
-        $_SESSION['user']=db()->query("SELECT * FROM usuario WHERE id_usuario=".(int)$u['id_usuario'])->fetch(); flash('Datos actualizados.'); redirect('perfil.php');
+        }else $pdo->prepare("UPDATE usuario SET nombre=?,apellido=?,telefono=? WHERE id_usuario=?")->execute([$nombre,$apellido,$telefono,$u['id_usuario']]);
+        $_SESSION['user']=$pdo->query("SELECT * FROM usuario WHERE id_usuario=".(int)$u['id_usuario'])->fetch(); flash('Datos actualizados.'); redirect('perfil.php');
     }catch(Throwable $e){$error=$e->getMessage();}
 }
 header_html('Perfil');

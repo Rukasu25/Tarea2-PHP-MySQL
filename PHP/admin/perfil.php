@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception('La nueva contraseña debe tener al menos 10 caracteres, una mayúscula, una minúscula y un número.');
                 }
 
-                $stmt = db()->prepare("
+                $stmt = $pdo->prepare("
                     UPDATE usuario 
                     SET nombre = ?, apellido = ?, telefono = ?, password_hash = ?
                     WHERE email = ?
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $u['email']
                 ]);
             } else {
-                $stmt = db()->prepare("
+                $stmt = $pdo->prepare("
                     UPDATE usuario 
                     SET nombre = ?, apellido = ?, telefono = ?
                     WHERE email = ?
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Actualizar sesión
-            $stmt = db()->prepare("SELECT * FROM usuario WHERE email = ?");
+            $stmt = $pdo->prepare("SELECT * FROM usuario WHERE email = ?");
             $stmt->execute([$u['email']]);
             $_SESSION['user'] = $stmt->fetch();
 

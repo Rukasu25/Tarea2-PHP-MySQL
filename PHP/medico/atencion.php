@@ -1,26 +1,26 @@
 <?php
 require_once __DIR__ . '/../includes/common.php'; require_role('MEDICO'); $u=user();
 $id=(int)($_GET['id']??0); $error='';
-$s=db()->prepare("SELECT * FROM vw_citas_detalle WHERE id_cita=? AND id_medico=?"); $s->execute([$id,$u['id_usuario']]); $c=$s->fetch();
+$s=$pdo->prepare("SELECT * FROM vw_citas_detalle WHERE id_cita=? AND id_medico=?"); $s->execute([$id,$u['id_usuario']]); $c=$s->fetch();
 if(!$c || $c['estado']!=='Atendida') exit('La cita no existe, no pertenece al medico o no esta Atendida.');
 if($_SERVER['REQUEST_METHOD']==='POST'){
     try{
-        db()->beginTransaction();
-        $q=db()->prepare("INSERT INTO atencion(id_cita,motivo,observaciones) VALUES(?,?,?)
+        $pdo->beginTransaction();
+        $q=$pdo->prepare("INSERT INTO atencion(id_cita,motivo,observaciones) VALUES(?,?,?)
         ON DUPLICATE KEY UPDATE motivo=VALUES(motivo), observaciones=VALUES(observaciones)");
         $q->execute([$id,trim($_POST['motivo']),trim($_POST['observaciones'])]);
-        $aid=(int)db()->query("SELECT id_atencion FROM atencion WHERE id_cita=$id")->fetchColumn();
-        db()->prepare("DELETE FROM diagnostico_atencion WHERE id_atencion=?")->execute([$aid]);
-        foreach(($_POST['diagnosticos']??[]) as $did) db()->prepare("INSERT INTO diagnostico_atencion VALUES(?,?)")->execute([$aid,(int)$did]);
+        $aid=(int)$pdo->query("SELECT id_atencion FROM atencion WHERE id_cita=$id")->fetchColumn();
+        $pdo->prepare("DELETE FROM diagnostico_atencion WHERE id_atencion=?")->execute([$aid]);
+        foreach(($_POST['diagnosticos']??[]) as $did) $pdo->prepare("INSERT INTO diagnostico_atencion VALUES(?,?)")->execute([$aid,(int)$did]);
         if(!empty($_POST['medicamento'])){
-            db()->prepare("INSERT INTO receta_linea(id_atencion,id_medicamento,dosis,dias_tratamiento) VALUES(?,?,?,?)")
+            $pdo->prepare("INSERT INTO receta_linea(id_atencion,id_medicamento,dosis,dias_tratamiento) VALUES(?,?,?,?)")
             ->execute([$aid,(int)$_POST['medicamento'],trim($_POST['dosis']),max(1,(int)$_POST['dias'])]);
         }
-        db()->commit(); flash('Atencion guardada.'); redirect('agenda.php');
-    }catch(Throwable $e){ if(db()->inTransaction())db()->rollBack(); $error=$e->getMessage(); }
+        $pdo->commit(); flash('Atencion guardada.'); redirect('agenda.php');
+    }catch(Throwable $e){ if($pdo->inTransaction())$pdo->rollBack(); $error=$e->getMessage(); }
 }
-$diag=db()->query("SELECT * FROM diagnostico ORDER BY codigo_cie10")->fetchAll();
-$meds=db()->query("SELECT * FROM medicamento ORDER BY nombre")->fetchAll();
+$diag=$pdo->query("SELECT * FROM diagnostico ORDER BY codigo_cie10")->fetchAll();
+$meds=$pdo->query("SELECT * FROM medicamento ORDER BY nombre")->fetchAll();
 header_html('Registrar atencion');
 ?>
 <div class="card p-4"><h2>Ficha de atencion</h2>

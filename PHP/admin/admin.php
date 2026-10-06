@@ -7,7 +7,7 @@ $u = user();
 // ============================================================
 // 1. RESUMEN GENERAL
 // ============================================================
-$stmt = db()->query("
+$stmt = $pdo->query("
     SELECT 
         (SELECT COUNT(*) FROM centro_medico) AS total_centros,
         (SELECT COUNT(*) FROM medico) AS total_medicos,
@@ -21,7 +21,7 @@ $resumen = $stmt->fetch();
 // ============================================================
 // 2. CITAS POR CENTRO CON PORCENTAJE DE INASISTENCIA
 // ============================================================
-$stmt = db()->query("
+$stmt = $pdo->query("
     SELECT 
         cm.id_centro,
         cm.nombre AS centro,
@@ -44,7 +44,7 @@ $citas_por_centro = $stmt->fetchAll();
 // ============================================================
 // 3. TOP 5 DIAGNÓSTICOS MÁS FRECUENTES DE LA RED
 // ============================================================
-$stmt = db()->query("
+$stmt = $pdo->query("
     SELECT 
         d.codigo_cie10,
         d.descripcion,
@@ -60,7 +60,7 @@ $top_diagnosticos = $stmt->fetchAll();
 // ============================================================
 // 4. CITAS POR ESTADO (GENERAL)
 // ============================================================
-$stmt = db()->query("
+$stmt = $pdo->query("
     SELECT ec.nombre AS estado, COUNT(*) AS total
     FROM cita c
     JOIN estado_cita ec ON ec.id_estado = c.id_estado

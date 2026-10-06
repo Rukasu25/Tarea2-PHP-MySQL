@@ -4,12 +4,12 @@ $fecha=$_GET['fecha']??date('Y-m-d');
 if(isset($_POST['id_cita'],$_POST['estado'])){
     $permitidas=['Confirmada','Atendida','No Asistio'];
     if(in_array($_POST['estado'],$permitidas,true)){
-        $s=db()->prepare("UPDATE cita SET id_estado=(SELECT id_estado FROM estado_cita WHERE nombre=?)
+        $s=$pdo->prepare("UPDATE cita SET id_estado=(SELECT id_estado FROM estado_cita WHERE nombre=?)
         WHERE id_cita=? AND id_medico=?");
         $s->execute([$_POST['estado'],(int)$_POST['id_cita'],$u['id_usuario']]); flash('Estado actualizado.');
     } redirect('agenda.php?fecha='.urlencode($fecha));
 }
-$s=db()->prepare("SELECT * FROM vw_citas_detalle WHERE id_medico=? AND DATE(fecha_hora)=? ORDER BY fecha_hora");
+$s=$pdo->prepare("SELECT * FROM vw_citas_detalle WHERE id_medico=? AND DATE(fecha_hora)=? ORDER BY fecha_hora");
 $s->execute([$u['id_usuario'],$fecha]); $rows=$s->fetchAll();
 header_html('Agenda medica');
 ?>

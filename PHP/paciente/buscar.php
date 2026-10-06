@@ -9,7 +9,7 @@ JOIN medico_especialidad me ON me.id_medico=m.id_medico JOIN especialidad e ON e
 JOIN medico_centro mc ON mc.id_medico=m.id_medico JOIN centro_medico c ON c.id_centro=mc.id_centro
 WHERE (?='' OR CONCAT(u.nombre,' ',u.apellido) LIKE ? OR e.nombre LIKE ?)
 GROUP BY u.id_usuario ORDER BY medico";
-$st=db()->prepare($sql); $like="%$q%"; $st->execute([$q,$like,$like]); $rows=$st->fetchAll();
+$st=$pdo->prepare($sql); $like="%$q%"; $st->execute([$q,$like,$like]); $rows=$st->fetchAll();
 header_html('Buscar médicos');
 ?>
 <div class="card p-4"><h2>Buscar médicos</h2><form class="row g-2 mb-3">

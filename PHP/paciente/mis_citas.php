@@ -1,15 +1,15 @@
 <?php
 require_once __DIR__ . '/../includes/common.php'; require_role('PACIENTE');
-db()->exec("CALL sp_cancelar_citas_vencidas()");
+$pdo->exec("CALL sp_cancelar_citas_vencidas()");
 $u=user();
 if(isset($_GET['cancelar'])){
     $id=(int)$_GET['cancelar'];
-    $st=db()->prepare("UPDATE cita SET id_estado=(SELECT id_estado FROM estado_cita WHERE nombre='Cancelada')
+    $st=$pdo->prepare("UPDATE cita SET id_estado=(SELECT id_estado FROM estado_cita WHERE nombre='Cancelada')
     WHERE id_cita=? AND id_paciente=? AND fecha_hora>NOW()
     AND id_estado IN (SELECT id_estado FROM estado_cita WHERE nombre IN ('Reservada','Confirmada'))");
     $st->execute([$id,$u['id_usuario']]); flash($st->rowCount()?'Cita cancelada.':'No se pudo cancelar la cita.'); redirect('mis_citas.php');
 }
-$st=db()->prepare("SELECT * FROM vw_citas_detalle WHERE id_paciente=? ORDER BY fecha_hora DESC");
+$st=$pdo->prepare("SELECT * FROM vw_citas_detalle WHERE id_paciente=? ORDER BY fecha_hora DESC");
 $st->execute([$u['id_usuario']]); $rows=$st->fetchAll();
 header_html('Mis citas');
 ?>
