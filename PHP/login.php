@@ -1,72 +1,84 @@
 <?php
-require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/common.php';
 
-$error = "";
+if (user()) {
+    switch (user()['rol']) {
+        case 'PACIENTE': redirect('paciente/dashboard.php');
+        case 'MEDICO':   redirect('medico/dashboard.php');
+        case 'ADMIN':    redirect('admin/admin.php');
+    }
+}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $rut = trim($_POST['rut'] ?? '');
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if (empty($rut) || empty($password)) {
-        $error = "Debe completar todos los campos.";
+    if (empty($email) || empty($password)) {
+        $error = 'Debe completar todos los campos.';
     } else {
-        try {
-            // -- busca directamente en la tabla Paciente
-            $stmt = $pdo->prepare("SELECT * FROM Paciente WHERE Rut_Paciente = ?");
-            $stmt->execute([$rut]);
-            $paciente = $stmt->fetch();
+        $stmt = $pdo->prepare("SELECT * FROM usuario WHERE email = ?");
+        $stmt->execute([$email]);
+        $usuario = $stmt->fetch();
 
-            // -- verifica si existe y si la contraseña coincide
-            if ($paciente && password_verify($password, $paciente['Contrasena'])) {
-                
-                // --se crean variables de inicio de sesion
-                $_SESSION['email'] = $paciente['Email'];
-                $_SESSION['rut'] = $paciente['Rut_Paciente'];
-                $_SESSION['rol'] = 'paciente';
-                
-                // --redireccion de db.php
-                redirigirSegunRol(); 
-                
-            } else {
-                $error = "RUT o contraseña incorrectos.";
+        if ($usuario && password_verify($password, $usuario['password_hash'])) {
+            $_SESSION['user'] = [
+                'email'    => $usuario['email'],
+                'rut'      => $usuario['rut'],
+                'nombre'   => $usuario['nombre'],
+                'apellido' => $usuario['apellido'],
+                'rol'      => $usuario['rol'],
+            ];
+
+            switch ($usuario['rol']) {
+                case 'PACIENTE': redirect('paciente/dashboard.php');
+                case 'MEDICO':   redirect('medico/dashboard.php');
+                case 'ADMIN':    redirect('admin/admin.php');
+                default:         redirect('index.php');
             }
-        } catch (Throwable $e) {
-            $error = "Error de base de datos: " . $e->getMessage();
+        } else {
+            $error = 'Email o contraseña incorrectos.';
         }
     }
 }
 
+header_html('Iniciar Sesión');
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Acceso - SaludUSM</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light d-flex align-items-center vh-100">
-    <div class="container text-center" style="max-width: 400px;">
-        <h2 class="mb-4 text-primary">SaludUSM</h2>
-        
-        <?php if ($error != ""): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-        <?php endif; ?>
 
-        <form method="POST" action="login.php" class="card p-4 shadow-sm">
-            <div class="mb-3 text-start">
-                <label class="form-label fw-bold">RUT (Ej: 12345678-9)</label>
-                <input type="text" name="rut" class="form-control" placeholder="12345678-9" required>
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión</h4>
             </div>
-            <div class="mb-4 text-start">
-                <label class="form-label fw-bold">Contraseña</label>
-                <input type="password" name="password" class="form-control" required>
+            <div class="card-body">
+                <?php if ($error): ?>
+                    <div class="alert alert-danger"><?= e($error) ?></div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Email</label>
+                        <input type="email" name="email" class="form-control" required autofocus
+                               value="<?= e($_POST['email'] ?? '') ?>">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contraseña</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-box-arrow-in-right"></i> Ingresar
+                    </button>
+                </form>
+
+                <hr>
+                <p class="text-center mb-0">
+                    ¿No tienes cuenta? <a href="registro.php">Regístrate aquí</a>
+                </p>
             </div>
-            <button type="submit" class="btn btn-primary w-100 mb-3">Ingresar</button>
-            
-            <!-- Registro restringido solo a pacientes -->
-            <a href="registro.php" class="text-decoration-none d-block">¿Eres paciente? Regístrate aquí</a>
-        </form>
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+<?php footer_html(); ?>

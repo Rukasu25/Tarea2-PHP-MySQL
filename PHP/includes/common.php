@@ -1,15 +1,23 @@
 <?php
 declare(strict_types=1);
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once __DIR__ . '/../config/db.php';
+session_start();
 
-// Detectar BASE_URL dinámicamente
-$base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
-$base = preg_replace('#/(paciente|medico|admin|includes|config)$#', '', $base);
-define('BASE_URL', $base);
+// ============================================================
+// CONEXIÓN A LA BASE DE DATOS
+// ============================================================
+$host = 'localhost';
+$dbname = 'saludusm';
+$username = 'root';
+$password = '';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error de conexión: " . $e->getMessage());
+}
 
 // ============================================================
 // FUNCIONES DE UTILIDAD
