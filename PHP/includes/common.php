@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // ============================================================
 // CONEXIÓN A LA BASE DE DATOS
@@ -20,18 +22,66 @@ try {
 }
 
 // ============================================================
+// DETECCIÓN ROBUSTA DE BASE_URL
+// Ruta del proyecto: C:\xampp\htdocs\Saludusm\PHP
+// URL base: http://localhost/Saludusm/PHP
+// ============================================================
+$script = $_SERVER['SCRIPT_NAME'] ?? '';
+$base = dirname($script);
+
+// Quitar subcarpetas de rol
+$base = preg_replace('#/(paciente|medico|admin|includes|config)$#', '', $base);
+
+// Limpiar
+if (empty($base) || $base === '.' || $base === '/' || $base === '\\') {
+    $base = '';
+}
+
+define('BASE_URL', rtrim($base, '/'));
+
+// ============================================================
 // FUNCIONES DE UTILIDAD
 // ============================================================
 
-function e($v): string { 
-    return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); 
+function e($v): string {
+    return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
 
-function redirect(string $url): never { 
-    header("Location: $url"); 
-    exit; 
+function url(string $path = ''): string {
+    return BASE_URL . '/' . ltrim($path, '/');
 }
 
+function redirect(string $url): never {
+    // URL absoluta (http:// o https://)
+    if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+        header("Location: $url");
+        exit;
+    }
+
+    // URL desde la raíz del sitio (empieza con /)
+    if (str_starts_with($url, '/')) {
+        header("Location: $url");
+        exit;
+    }
+
+    // Detectar la carpeta actual del script
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+    $dir = dirname($script);  // Ej: /Saludusm/PHP/paciente
+
+    // Si estamos en una subcarpeta de rol, agregarla
+    if (preg_match('#/(paciente|medico|admin)$#', $dir, $m)) {
+        $carpeta = $m[1];  // "paciente", "medico" o "admin"
+
+        // Si la URL ya incluye la carpeta, no duplicar
+        if (!str_starts_with($url, $carpeta . '/')) {
+            $url = $carpeta . '/' . ltrim($url, '/');
+        }
+    }
+
+    // Redirigir a BASE_URL + URL resuelta
+    header("Location: " . BASE_URL . '/' . ltrim($url, '/'));
+    exit;
+}
 function flash(?string $msg = null): ?string {
     if ($msg !== null) $_SESSION['flash'] = $msg;
     $x = $_SESSION['flash'] ?? null;
@@ -39,12 +89,12 @@ function flash(?string $msg = null): ?string {
     return $x;
 }
 
-function user(): ?array { 
-    return $_SESSION['user'] ?? null; 
+function user(): ?array {
+    return $_SESSION['user'] ?? null;
 }
 
-function require_login(): void { 
-    if (!user()) redirect(url('login.php')); 
+function require_login(): void {
+    if (!user()) redirect('login.php');
 }
 
 function require_role(string ...$roles): void {
@@ -53,10 +103,6 @@ function require_role(string ...$roles): void {
         http_response_code(403);
         exit('Acceso denegado');
     }
-}
-
-function url(string $path = ''): string { 
-    return BASE_URL . '/' . ltrim($path, '/'); 
 }
 
 // ============================================================
@@ -70,11 +116,12 @@ function header_html(string $title): void {
     echo '<title>' . e($title) . ' - SaludUSM</title>';
     echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">';
     echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">';
-    echo '<link href="' . url('CSS/style.css') . '" rel="stylesheet"></head><body>';
+    echo '</head><body class="bg-light">';
 
     if ($u) {
         echo '<nav class="navbar navbar-dark bg-primary navbar-expand-lg"><div class="container">';
-        echo '<a class="navbar-brand" href="' . url($u['rol'] === 'PACIENTE' ? 'paciente/dashboard.php' : ($u['rol'] === 'MEDICO' ? 'medico/dashboard.php' : 'admin/dashboard.php')) . '">';
+        $home = url($u['rol'] === 'PACIENTE' ? 'paciente/dashboard.php' : ($u['rol'] === 'MEDICO' ? 'medico/dashboard.php' : 'admin/admin.php'));
+        echo '<a class="navbar-brand" href="' . $home . '">';
         echo '<i class="bi bi-hospital"></i> SaludUSM</a>';
         echo '<div class="navbar-nav ms-auto align-items-center">';
 
@@ -83,19 +130,18 @@ function header_html(string $title): void {
             echo '<a class="nav-link" href="' . url('paciente/mis_citas.php') . '">Mis citas</a>';
             echo '<a class="nav-link" href="' . url('paciente/agendar.php') . '">Agendar</a>';
             echo '<a class="nav-link" href="' . url('paciente/historial.php') . '">Historial</a>';
-        }
-        if ($u['rol'] === 'MEDICO') {
+        } elseif ($u['rol'] === 'MEDICO') {
             echo '<a class="nav-link" href="' . url('medico/agenda.php') . '">Agenda</a>';
             echo '<a class="nav-link" href="' . url('medico/historial_medico.php') . '">Historial pacientes</a>';
-        }
-        if ($u['rol'] === 'ADMIN') {
-            echo '<a class="nav-link" href="' . url('admin/admin.php') . '">Administración</a>';
+        } elseif ($u['rol'] === 'ADMIN') {
+            echo '<a class="nav-link" href="' . url('admin/admin.php') . '">Panel</a>';
             echo '<a class="nav-link" href="' . url('admin/centros.php') . '">Centros</a>';
             echo '<a class="nav-link" href="' . url('admin/medicos.php') . '">Médicos</a>';
             echo '<a class="nav-link" href="' . url('admin/buscar_citas.php') . '">Buscar citas</a>';
         }
 
-        echo '<a class="nav-link" href="' . url(($u['rol'] === 'PACIENTE' ? 'paciente/perfil.php' : ($u['rol'] === 'MEDICO' ? 'medico/perfil.php' : 'admin/perfil.php'))) . '">Perfil</a>';
+        $perfil = url($u['rol'] === 'PACIENTE' ? 'paciente/perfil.php' : ($u['rol'] === 'MEDICO' ? 'medico/perfil.php' : 'admin/perfil.php'));
+        echo '<a class="nav-link" href="' . $perfil . '">Perfil</a>';
         echo '<span class="navbar-text ms-3 me-2"><i class="bi bi-person-circle"></i> ' . e($u['nombre']) . '</span>';
         echo '<a class="nav-link" href="' . url('logout.php') . '">Salir</a>';
         echo '</div></div></nav>';
