@@ -1,13 +1,16 @@
 <?php
 declare(strict_types=1);
+define('BASE_URL', '/Tarea2-PHP-MySQL/');
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // ============================================================
 // CONEXIÓN A LA BASE DE DATOS
 // ============================================================
 $host = 'localhost';
-$dbname = 'saludusm';
+$dbname = 'SALUD_USM';
 $username = 'root';
 $password = '';
 

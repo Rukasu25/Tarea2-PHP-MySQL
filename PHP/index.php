@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/common.php';
 
 $q = trim($_GET['q'] ?? '');
@@ -8,23 +9,17 @@ if ($q !== '') {
     $like = "%$q%";
     $stmt = $pdo->prepare("
         SELECT 
-            m.id_medico,
-            u.email,
-            CONCAT(u.nombre, ' ', u.apellido) AS medico,
-            GROUP_CONCAT(DISTINCT e.nombre ORDER BY e.nombre SEPARATOR ', ') AS especialidades,
-            GROUP_CONCAT(DISTINCT CONCAT(c.nombre, ' (', c.comuna, ')') ORDER BY c.nombre SEPARATOR ' | ') AS centros
-        FROM medico m
-        JOIN usuario u ON u.email = m.email
-        LEFT JOIN medico_especialidad me ON me.id_medico = m.id_medico
-        LEFT JOIN especialidad e ON e.id_especialidad = me.id_especialidad
-        LEFT JOIN medico_centro mc ON mc.id_medico = m.id_medico
-        LEFT JOIN centro_medico c ON c.id_centro = mc.id_centro
-        WHERE u.nombre LIKE ? OR u.apellido LIKE ? 
-           OR CONCAT(u.nombre, ' ', u.apellido) LIKE ? OR e.nombre LIKE ?
-        GROUP BY m.id_medico, u.email, u.nombre, u.apellido
-        ORDER BY u.apellido, u.nombre
+            Rut_Medico AS id_medico,
+            Rut_Medico AS email, 
+            Nombre AS medico,
+            'No especificada' AS especialidades,
+            'No especificado' AS centros
+        FROM Medico
+        WHERE Nombre LIKE ?
+        ORDER BY Nombre
     ");
-    $stmt->execute([$like, $like, $like, $like]);
+
+    $stmt->execute([$like]);
     $rows = $stmt->fetchAll();
 }
 
@@ -44,8 +39,8 @@ header_html('Inicio');
         <form method="GET" class="row g-3">
             <div class="col-md-10">
                 <input type="text" name="q" class="form-control form-control-lg" 
-                       placeholder="Buscar por nombre o especialidad..." 
-                       value="<?= e($q) ?>">
+                    placeholder="Buscar por nombre o especialidad..." 
+                    value="<?= e($q) ?>">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary btn-lg w-100">Buscar</button>
