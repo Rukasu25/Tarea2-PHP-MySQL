@@ -187,12 +187,12 @@ def generar_sql_completo():
     print("=" * 60)
     
     # Generar hash
-    print("\n🔐 Generando hash con PHP...")
+    print("\n Generando hash con PHP...")
     try:
         hash_pwd = generar_hash(PASSWORD)
-        print(f"✅ Hash: {hash_pwd[:60]}...")
+        print(f"yey Hash: {hash_pwd[:60]}...")
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"X Error: {e}")
         return None
     
     sql = []
@@ -271,13 +271,13 @@ def generar_sql_completo():
     CANT_MEDICOS = 8
     CANT_PACIENTES = 20
     
-    print(f"\n📝 Generando {CANT_ADMINS} admins...")
+    print(f"\nGenerando {CANT_ADMINS} admins...")
     admins = generar_usuarios(CANT_ADMINS, 'ADMIN', hash_pwd)
     
-    print(f"📝 Generando {CANT_MEDICOS} médicos...")
+    print(f"Generando {CANT_MEDICOS} médicos...")
     medicos = generar_usuarios(CANT_MEDICOS, 'MEDICO', hash_pwd)
     
-    print(f"📝 Generando {CANT_PACIENTES} pacientes...")
+    print(f"Generando {CANT_PACIENTES} pacientes...")
     pacientes = generar_usuarios(CANT_PACIENTES, 'PACIENTE', hash_pwd)
     
     # Admins
@@ -552,11 +552,11 @@ if __name__ == "__main__":
         f.write(sql)
     
     print("\n" + "=" * 60)
-    print("✅ ARCHIVO GENERADO")
+    print("ARCHIVO GENERADO")
     print("=" * 60)
-    print(f"📁 Ubicación: {ruta_archivo}")
-    print(f"📄 Total de líneas: {len(sql.splitlines())}")
-    print(f"\n📊 Resumen:")
+    print(f"Ubicación: {ruta_archivo}")
+    print(f"Total de líneas: {len(sql.splitlines())}")
+    print(f"\nResumen:")
     print(f"   Admins:     {len(admins)}")
     print(f"   Médicos:    {len(medicos)}")
     print(f"   Pacientes:  {len(pacientes)}")
@@ -565,25 +565,25 @@ if __name__ == "__main__":
     print(f"   Recetas:    ~60")
     
     print("\n" + "=" * 60)
-    print(f"🔑 CONTRASEÑA PARA TODOS: {PASSWORD}")
+    print(f"CONTRASEÑA PARA TODOS: {PASSWORD}")
     print("=" * 60)
     
-    print("\n📧 ADMINS:")
+    print("\nADMINS:")
     for u in admins:
         print(f"   {u['email']}")
     
-    print("\n📧 MÉDICOS:")
+    print("\nMÉDICOS:")
     for u in medicos:
         print(f"   {u['email']}")
     
-    print("\n📧 PACIENTES:")
+    print("\nPACIENTES:")
     for u in pacientes[:5]:
         print(f"   {u['email']}")
     if len(pacientes) > 5:
         print(f"   ... y {len(pacientes) - 5} más")
     
     print("\n" + "=" * 60)
-    print("📋 SIGUIENTE PASO:")
+    print("SIGUIENTE PASO:")
     print("=" * 60)
     print("1. Abre phpMyAdmin")
     print("2. Selecciona la BD 'saludusm'")

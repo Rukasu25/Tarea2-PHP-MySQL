@@ -1,12 +1,12 @@
 ============================================================
-🔑 CONTRASEÑA PARA TODOS: Password123!
+CONTRASEÑA PARA TODOS: Password123!
 ============================================================
 
-📧 ADMINS:
+ADMINS:
    hector.tapia88668@saludusm.cl
    patricia.castro87097@saludusm.cl
 
-📧 MÉDICOS:
+MÉDICOS:
    roberto.morales70432@saludusm.cl
    ricardo.espinoza69621@saludusm.cl
    constanza.fuentes31978@saludusm.cl
@@ -16,16 +16,15 @@
    luis.diaz60532@saludusm.cl
    valentina.castro29578@saludusm.cl
 
-📧 PACIENTES:
+PACIENTES:
    felipe.espinoza49929@correo.cl
    carlos.lopez83373@correo.cl
    maria.flores78790@correo.cl
    diego.silva92353@correo.cl
    cristobal.alvarez13891@correo.cl
-   ... y 15 más
 
 ============================================================
-📋 SIGUIENTE PASO:
+ SIGUIENTE PASO:
 ============================================================
 1. Abre phpMyAdmin
 2. Selecciona la BD 'saludusm'

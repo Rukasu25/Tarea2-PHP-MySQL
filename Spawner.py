@@ -73,7 +73,7 @@ if __name__ == "__main__":
     CANT_MEDICOS = 8
     CANT_PACIENTES = 15
 
-    # 🔐 Generar hash
+    # aqui se genera el hash
     print("\n🔐 Generando hash con PHP...")
     try:
         hash_pwd = generar_hash(PASSWORD)
@@ -82,8 +82,8 @@ if __name__ == "__main__":
         print(f"❌ Error: {e}")
         exit(1)
 
-    # 📝 Generar SQL
-    print("\n📝 Generando SQL...")
+    # aqui genearamos el SQL
+    print("\nGenerando SQL...")
     sql = ["USE saludusm;\n"]
     
     usuarios = []
@@ -125,17 +125,17 @@ if __name__ == "__main__":
     with open(ruta_archivo, 'w', encoding='utf-8') as f:
         f.write("\n".join(sql))
     
-    print(f"\n✅ Archivo generado")
-    print(f"📁 Ubicación: {ruta_archivo}")
-    print(f"📄 Total de líneas: {len(sql)}")
-    print(f"👥 Usuarios generados: {len(usuarios)}")
+    print(f"\nArchivo generado")
+    print(f"Ubicación: {ruta_archivo}")
+    print(f"Total de líneas: {len(sql)}")
+    print(f"Usuarios generados: {len(usuarios)}")
     print(f"   - Admins:    {CANT_ADMINS}")
     print(f"   - Médicos:   {CANT_MEDICOS}")
     print(f"   - Pacientes: {CANT_PACIENTES}")
-    print(f"\n🔑 Contraseña para todos: {PASSWORD}")
+    print(f"\nContraseña para todos: {PASSWORD}")
     
     print("\n" + "=" * 60)
-    print("📧 EMAILS GENERADOS:")
+    print("EMAILS GENERADOS:")
     print("=" * 60)
     for u in usuarios:
         print(f"  [{u['rol']:8}] {u['email']}")
