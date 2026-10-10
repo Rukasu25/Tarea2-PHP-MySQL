@@ -1,0 +1,36 @@
+============================================================
+🔑 CONTRASEÑA PARA TODOS: Password123!
+============================================================
+
+📧 ADMINS:
+   hector.tapia88668@saludusm.cl
+   patricia.castro87097@saludusm.cl
+
+📧 MÉDICOS:
+   roberto.morales70432@saludusm.cl
+   ricardo.espinoza69621@saludusm.cl
+   constanza.fuentes31978@saludusm.cl
+   martina.soto88829@saludusm.cl
+   pablo.silva66247@saludusm.cl
+   javiera.lopez30555@saludusm.cl
+   luis.diaz60532@saludusm.cl
+   valentina.castro29578@saludusm.cl
+
+📧 PACIENTES:
+   felipe.espinoza49929@correo.cl
+   carlos.lopez83373@correo.cl
+   maria.flores78790@correo.cl
+   diego.silva92353@correo.cl
+   cristobal.alvarez13891@correo.cl
+   ... y 15 más
+
+============================================================
+📋 SIGUIENTE PASO:
+============================================================
+1. Abre phpMyAdmin
+2. Selecciona la BD 'saludusm'
+3. Ve a la pestaña SQL
+4. Copia y pega el contenido de 'poblamiento_completo.sql'
+5. Ejecuta
+6. Prueba el login con cualquiera de los emails generados
+============================================================
