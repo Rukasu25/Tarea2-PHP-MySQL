@@ -37,7 +37,8 @@ if (empty($base) || $base === '.' || $base === '/' || $base === '\\') {
     $base = '';
 }
 
-define('BASE_URL', rtrim($base, '/'));
+$ruta_dinamica = substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], '/PHP/') + 5);
+define('BASE_URL', $ruta_dinamica);
 
 // ============================================================
 // FUNCIONES DE UTILIDAD
