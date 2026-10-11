@@ -3,17 +3,12 @@ import random
 import os
 from datetime import datetime, timedelta
 
-# ============================================================
-# GENERADOR COMPLETO DE DATOS DE PRUEBA - SALUDUSM
-# ============================================================
 
-# Configuración de PHP
 RUTA_PHP = r'C:\xampp\php\php.exe'
 PASSWORD = 'Password123!'
 
-# ============================================================
-# DATOS BASE
-# ============================================================
+ 
+ 
 
 NOMBRES_M = ['Juan', 'Carlos', 'Pedro', 'Luis', 'Diego', 'Jorge', 'Ricardo', 'Andres',
              'Felipe', 'Sebastian', 'Matias', 'Cristobal', 'Alejandro', 'Roberto',
@@ -74,9 +69,7 @@ DOSIS = [
     '1 mg cada 24 horas', '40 mg cada 12 horas', '2 puff cada 6 horas'
 ]
 
-# ============================================================
-# FUNCIONES AUXILIARES
-# ============================================================
+ 
 
 def generar_rut():
     """Genera un RUT único."""
@@ -122,9 +115,8 @@ def escapar_sql(s):
         return 'NULL'
     return s.replace("'", "''")
 
-# ============================================================
-# GENERADORES DE USUARIOS
-# ============================================================
+
+ 
 
 def generar_usuarios(cantidad, rol, hash_pwd, usar_dominio_correo=False):
     """Genera una lista de usuarios."""
@@ -175,9 +167,7 @@ def generar_usuarios(cantidad, rol, hash_pwd, usar_dominio_correo=False):
     
     return usuarios
 
-# ============================================================
-# GENERADOR DE CÓDIGO SQL
-# ============================================================
+ 
 
 def generar_sql_completo():
     """Genera todo el SQL de poblamiento."""
@@ -205,9 +195,9 @@ def generar_sql_completo():
     sql.append("USE saludusm;")
     sql.append("")
     
-    # ============================================================
+     
     # 1. CATÁLOGOS
-    # ============================================================
+     
     sql.append("-- ============================================================")
     sql.append("-- 1. CATÁLOGOS")
     sql.append("-- ============================================================")
@@ -259,12 +249,8 @@ def generar_sql_completo():
         sql.append(f"('{med}'){sep}")
     sql.append("")
     
-    # ============================================================
-    # 2. USUARIOS
-    # ============================================================
-    sql.append("-- ============================================================")
+     
     sql.append("-- 2. USUARIOS (contraseña: Password123!)")
-    sql.append("-- ============================================================")
     sql.append("")
     
     CANT_ADMINS = 2
@@ -310,13 +296,7 @@ def generar_sql_completo():
         )
     sql.append("")
     
-    # ============================================================
-    # 3. PACIENTES Y MEDICOS
-    # ============================================================
-    sql.append("-- ============================================================")
-    sql.append("-- 3. REGISTROS EN TABLAS PACIENTE Y MEDICO")
-    sql.append("-- ============================================================")
-    sql.append("")
+    
     
     sql.append("-- Insertar en tabla paciente")
     for u in pacientes:
@@ -329,13 +309,9 @@ def generar_sql_completo():
         sql.append(f"INSERT INTO medico(email) VALUES ('{escapar_sql(u['email'])}');")
     sql.append("")
     
-    # ============================================================
-    # 4. ESPECIALIDADES Y CENTROS DE MEDICOS
-    # ============================================================
-    sql.append("-- ============================================================")
-    sql.append("-- 4. ESPECIALIDADES Y CENTROS DE MEDICOS")
-    sql.append("-- ============================================================")
-    sql.append("")
+     
+     
+
     sql.append("-- NOTA: Los id_medico se asignan automáticamente.")
     sql.append("-- Estos INSERT asumen que los médicos tienen IDs 1-{}".format(CANT_MEDICOS))
     sql.append("-- Ajusta si ya tenías médicos en la BD.")
@@ -357,18 +333,11 @@ def generar_sql_completo():
             sql.append(f"INSERT INTO medico_centro(id_medico, id_centro) VALUES ({i}, {c});")
     sql.append("")
     
-    # ============================================================
-    # 5. CITAS
-    # ============================================================
-    sql.append("-- ============================================================")
-    sql.append("-- 5. CITAS")
-    sql.append("-- ============================================================")
-    sql.append("")
+    
     sql.append("-- id_estado: 1=Reservada, 2=Confirmada, 3=Atendida, 4=No Asistio, 5=Cancelada")
     sql.append("-- id_paciente: 1-{}  |  id_medico: 1-{}".format(CANT_PACIENTES, CANT_MEDICOS))
     sql.append("")
-    
-    # Generar citas variadas
+
     citas_generadas = []
     
     # Citas ATENDIDAS (pasadas)
@@ -469,13 +438,7 @@ def generar_sql_completo():
         )
     sql.append("")
     
-    # ============================================================
-    # 6. ATENCIONES (solo para citas Atendidas)
-    # ============================================================
-    sql.append("-- ============================================================")
-    sql.append("-- 6. ATENCIONES")
-    sql.append("-- ============================================================")
-    sql.append("")
+     
     sql.append("-- NOTA: Solo para citas con estado Atendida (id_estado=3)")
     sql.append("-- Los id_cita se asignan automáticamente.")
     sql.append("-- Este INSERT asume que las citas atendidas tienen IDs 1-30.")
@@ -491,13 +454,7 @@ def generar_sql_completo():
         )
     sql.append("")
     
-    # ============================================================
-    # 7. DIAGNOSTICOS POR ATENCION
-    # ============================================================
-    sql.append("-- ============================================================")
-    sql.append("-- 7. DIAGNOSTICOS POR ATENCION")
-    sql.append("-- ============================================================")
-    sql.append("")
+     
     
     for id_atencion in range(1, 31):
         num_diag = random.randint(1, 2)
@@ -506,13 +463,8 @@ def generar_sql_completo():
             sql.append(f"INSERT INTO diagnostico_atencion(id_atencion, id_diagnostico) VALUES ({id_atencion}, {d});")
     sql.append("")
     
-    # ============================================================
-    # 8. RECETAS
-    # ============================================================
-    sql.append("-- ============================================================")
-    sql.append("-- 8. RECETAS")
-    sql.append("-- ============================================================")
-    sql.append("")
+     
+
     
     for id_atencion in range(1, 31):
         num_recetas = random.randint(1, 2)
@@ -524,17 +476,13 @@ def generar_sql_completo():
                 f"INSERT INTO receta_linea(id_atencion, id_medicamento, dosis, dias_tratamiento) VALUES "
                 f"({id_atencion}, {m}, '{escapar_sql(dosis)}', {dias});"
             )
-    sql.append("")
-    
-    sql.append("-- ============================================================")
-    sql.append("-- FIN DE LOS DATOS DE PRUEBA")
-    sql.append("-- ============================================================")
-    
+
+
     return "\n".join(sql), admins, medicos, pacientes
 
-# ============================================================
+ 
 # MAIN
-# ============================================================
+ 
 
 if __name__ == "__main__":
     resultado = generar_sql_completo()
@@ -591,4 +539,4 @@ if __name__ == "__main__":
     print(f"4. Copia y pega el contenido de '{os.path.basename(ruta_archivo)}'")
     print("5. Ejecuta")
     print("6. Prueba el login con cualquiera de los emails generados")
-    print("=" * 60)
+    print("=" * 60) 
