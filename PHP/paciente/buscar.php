@@ -9,9 +9,9 @@ if ($q !== '') {
     $like = "%$q%";
     $stmt = $pdo->prepare("
         SELECT m.id_medico, u.email,
-               CONCAT(u.nombre, ' ', u.apellido) AS medico,
-               GROUP_CONCAT(DISTINCT e.nombre ORDER BY e.nombre SEPARATOR ', ') AS especialidades,
-               GROUP_CONCAT(DISTINCT CONCAT(c.nombre, ' (', c.comuna, ')') ORDER BY c.nombre SEPARATOR ' | ') AS centros
+            CONCAT(u.nombre, ' ', u.apellido) AS medico,
+            GROUP_CONCAT(DISTINCT e.nombre ORDER BY e.nombre SEPARATOR ', ') AS especialidades,
+            GROUP_CONCAT(DISTINCT CONCAT(c.nombre, ' (', c.comuna, ')') ORDER BY c.nombre SEPARATOR ' | ') AS centros
         FROM medico m
         JOIN usuario u ON u.email = m.email
         LEFT JOIN medico_especialidad me ON me.id_medico = m.id_medico

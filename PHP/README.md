@@ -1,1 +1,6 @@
 # Tarea2-PHP-MySQL
+
+Lukas Ignacio Labrín Salazar 202473624-8
+Pablo ....
+
+[!] AGREGAR INSTRUCCIONES Y TODO LO NECESARIO QUE PIDE EL README [!]

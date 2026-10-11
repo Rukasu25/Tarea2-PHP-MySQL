@@ -104,7 +104,8 @@ header_html('Agendar hora');
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-outline-primary w-100">Filtrar</button>
+                <!-- Se reemplaza el botón de submit por un enlace que limpia la URL -->
+                <a href="agendar.php" class="btn btn-outline-secondary w-100">Limpiar</a>
             </div>
         </form>
 

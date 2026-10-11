@@ -5,6 +5,10 @@ require_role('MEDICO');
 $u = user();
 $error = '';
 
+
+$identificador = $u['email'] ?? $u['rut'] ?? '';
+
+
 $stmt = $pdo->prepare("
     SELECT u.email, u.rut, u.nombre, u.apellido, u.telefono, u.fecha_nacimiento, u.sexo,
            m.id_medico,
@@ -16,11 +20,24 @@ $stmt = $pdo->prepare("
     LEFT JOIN especialidad e ON e.id_especialidad = me.id_especialidad
     LEFT JOIN medico_centro mc ON mc.id_medico = m.id_medico
     LEFT JOIN centro_medico cm ON cm.id_centro = mc.id_centro
-    WHERE u.email = ?
+    WHERE u.email = ? OR u.rut = ?
     GROUP BY u.email, u.rut, u.nombre, u.apellido, u.telefono, u.fecha_nacimiento, u.sexo, m.id_medico
 ");
-$stmt->execute([$u['email']]);
+$stmt->execute([$identificador, $identificador]);
 $medico = $stmt->fetch();
+
+
+if (!$medico) {
+    $medico = [
+        'email' => $identificador,
+        'rut' => 'No encontrado',
+        'nombre' => 'Error',
+        'apellido' => '',
+        'telefono' => '',
+        'especialidades' => '',
+        'centros' => ''
+    ];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre = trim($_POST['nombre']);
@@ -35,10 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         if ($pass !== '') {
             $stmt = $pdo->prepare("UPDATE usuario SET nombre=?, apellido=?, telefono=?, password_hash=? WHERE email=?");
-            $stmt->execute([$nombre, $apellido, $telefono, password_hash($pass, PASSWORD_DEFAULT), $u['email']]);
+            $stmt->execute([$nombre, $apellido, $telefono, password_hash($pass, PASSWORD_DEFAULT), $medico['email']]);
         } else {
             $stmt = $pdo->prepare("UPDATE usuario SET nombre=?, apellido=?, telefono=? WHERE email=?");
-            $stmt->execute([$nombre, $apellido, $telefono, $u['email']]);
+            $stmt->execute([$nombre, $apellido, $telefono, $medico['email']]);
         }
         $_SESSION['user']['nombre'] = $nombre;
         $_SESSION['user']['apellido'] = $apellido;

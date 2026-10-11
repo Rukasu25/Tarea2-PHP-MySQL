@@ -283,9 +283,10 @@ BEGIN
         SET MESSAGE_TEXT = 'El medico no atiende en el centro seleccionado';
     END IF;
 
-    IF NEW.fecha_hora <= NOW() THEN
+    -- Solo exigir fecha futura si la cita se está recién reservando
+    IF NEW.id_estado = 1 AND NEW.fecha_hora <= NOW() THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'La cita debe quedar en una fecha futura';
+        SET MESSAGE_TEXT = 'La cita a reservar debe quedar en una fecha futura';
     END IF;
 END;";
 
