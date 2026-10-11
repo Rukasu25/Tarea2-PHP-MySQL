@@ -1,4 +1,7 @@
 <?php
+// ============================================================
+// CONEXIÓN A LA BASE DE DATOS
+// ============================================================
 
 $host = 'localhost';
 $dbname = 'SALUD_USM';
@@ -17,6 +20,11 @@ try {
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// ============================================================
+// FUNCIONES DE UTILIDAD
+// ============================================================
+
 function estaLogueado() {
     return isset($_SESSION['email']);
 }

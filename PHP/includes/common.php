@@ -5,7 +5,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
+// ============================================================
+// CONEXIÓN A LA BASE DE DATOS
+// ============================================================
 $host = 'localhost';
 $dbname = 'saludusm';
 $username = 'root';
@@ -19,20 +21,27 @@ try {
     die("Error de conexión: " . $e->getMessage());
 }
 
+// ============================================================
+// DETECCIÓN ROBUSTA DE BASE_URL
+// Ruta del proyecto: C:\xampp\htdocs\Saludusm\PHP
+// URL base: http://localhost/Saludusm/PHP
+// ============================================================
 $script = $_SERVER['SCRIPT_NAME'] ?? '';
 $base = dirname($script);
 
 // Quitar subcarpetas de rol
 $base = preg_replace('#/(paciente|medico|admin|includes|config)$#', '', $base);
 
-
+// Limpiar
 if (empty($base) || $base === '.' || $base === '/' || $base === '\\') {
     $base = '';
 }
 
-$ruta_dinamica = substr($_SERVER['SCRIPT_NAME'], 0, strpos($_SERVER['SCRIPT_NAME'], '/PHP/') + 5);
-define('BASE_URL', $ruta_dinamica);
+define('BASE_URL', rtrim($base, '/'));
 
+// ============================================================
+// FUNCIONES DE UTILIDAD
+// ============================================================
 
 function e($v): string {
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
@@ -96,6 +105,9 @@ function require_role(string ...$roles): void {
     }
 }
 
+// ============================================================
+// HEADER Y FOOTER
+// ============================================================
 
 function header_html(string $title): void {
     $u = user();
